@@ -1,0 +1,1 @@
+<?php exit;?>{"robot":"0","qiandao":"0","ctrip":"0","alimama":"1","wap":"0","wap_default":"0","wap_daogou":"0","licai":"0","dd_chaofan":"0"}

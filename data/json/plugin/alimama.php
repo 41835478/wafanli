@@ -1,0 +1,1 @@
+<?php exit;?>{"status":"1","tongxin_password":"wafanli"}

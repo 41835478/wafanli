@@ -1,0 +1,1 @@
+<?php exit;?>{"curl":"3","file_get_contents":"2","fsockopen":"1"}

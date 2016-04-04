@@ -1,0 +1,1 @@
+<?php exit;?>[{"id":"2","key":"101187568","secret":"9a6f209ca7c40f860e725a12dec13f40","title":"QQ\u8d26\u53f7","code":"qq","open":"1","sort":"0","addtime":"1334223685","sys":"1","back_url":"http:\/\/www.wafanli.cn"}]

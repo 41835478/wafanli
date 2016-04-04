@@ -1,0 +1,9 @@
+<?php
+$dbserver='localhost';
+$dbuser='root';
+$dbpass='';
+$dbname='wafanli2016';
+$BIAOTOU='wafanli_';
+define('BIAOTOU',$BIAOTOU);
+define('DDKEY','#cr+zv$7qk');
+?>

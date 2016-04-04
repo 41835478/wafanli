@@ -1,0 +1,1 @@
+<?php exit;?>{"time":1459699206,"code":"f029VdUH9X524zNl+csZ2L\/koItzZwWRABlixyFpnzEu+pIfB8oy580MFoQxeo1DSSB5B0ddtIBT8cbDQVnAejoiXkGEYIQgtIdwydl4bxkmfHU0afsNcPlojxOUiXm+tU3gGaiTGRxtDRCKwbfpZP1C\/Q19\/EX96INOtivQImtQX2QXn2E0cQZ9QH+zkU5YuH9+KugBwnzbdc8F1LBs3jP5j5oLRWMXQcBmdgldFYDgUbWpORisPKDTzwS1lN3CaQ0"}
