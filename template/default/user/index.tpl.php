@@ -7,6 +7,10 @@ if($dduser['email']==''){
 	jump(u('user','info',array('from'=>u('user','index'))),'请先绑定邮箱');
 }
 
+if($dduser['mobile']==0){
+	jump(u('user','info',array('from'=>u('user','index'))),'请先设置手机号');
+}
+
 $parameter=act_user_index();
 extract($parameter);
 if($dduser['txstatus']=='1'){
@@ -34,16 +38,27 @@ else{
 		$tbtxstate_msg = "您当前有一笔".TBMONEY."提取申请正在处理当中，我们将支付到您的支付宝中，请注意查收！ <a href='".u('user','mingxi',array('do'=>'out'))."'>>>查看详细</a>";
 	}else{
 		if($dduser['jifenbao']==0){
-			$tbtxstate_msg = "感谢您使用".WEBNAME."，当您购物累积获得返利超过".$webset['tixian']['tblimit'].TBMONEYUNIT.TBMONEY."，就可以申请提取。祝您购物愉快！";
+			$tbtxstate_msg = "感谢您使用".WEBNAME."，天天复制淘宝商品查询返利送".$webset['sign']['jifenbao']."集分宝。祝您购物愉快！";
 		}elseif($dduser['live_jifenbao']<$webset['tixian']['tblimit']){
 			$tbtxstate_msg = '亲！您当前的可用'.TBMONEY.'是 <span>'.$dduser['live_jifenbao'].TBMONEYUNIT.'</span>，还差 <span>'.($webset['tixian']['tblimit']-$dduser['live_jifenbao']).'</span>'.TBMONEY.'就可以申请提取了！';
+		}elseif($dduser['auto_jfb']>=500){
+			$tbtxstate_msg = "亲！您当前已经设置当集分宝大于<span>".$dduser['auto_jfb']."</span>个集分宝时自动提取，挖返利会自动提到您的支付宝中。";
+
 		}else{
-			$tbtxstate_msg = "亲！您当前的可用".TBMONEY."是<span>".$dduser['live_jifenbao'].TBMONEYUNIT."</span>，可以申请提取了！&nbsp;&nbsp;&nbsp;&nbsp;<img style='margin-bottom:-10px' src='images/face/2.gif'/><a href='".u('user','tixian',array('type'=>1))."'><b style='color:red;cursor:pointer'>申请提取</b>>>></a>";
+			$tbtxstate_msg = "当前购物返利".TBMONEY.":<span>".$dduser['live_jifenbao'].TBMONEYUNIT."</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href='".u('user','tixian',array('type'=>1))."'><b style='color:red;cursor:pointer'>申请提取</b>>>></a>";
+
 		}
 	}
 }
 
+if($dduser['search_jfb']>0){
+	$searchjfbstate_msg="当前查询奖励集分宝剩余:<span>".$dduser['search_jfb']."个</span>&nbsp;&nbsp;<a href='".u('user','info',array('do'=>'caiwu'))."'><b style='color:red;cursor:pointer'>设置自动返利</b>>>></a>(查询奖励集分宝和购物返利集分宝1:1自动提取)";
+}else{
+	$searchjfbstate_msg="当前查询奖励集分宝:<span>0个</span>&nbsp;&nbsp;<a href='".u('user','info',array('do'=>'caiwu'))."'><b style='color:red;cursor:pointer'>设置自动返利</b>>>></a>(查询奖励集分宝和购物返利集分宝1:1自动提取)";
 
+}
+
+/*
 if($sign==1){
 	$sign_word='亲！您今天还没有签到哦！签到可获得';
 	$sign_get='';
@@ -71,6 +86,7 @@ else{
 	$js_sign_get_tip='签到完成';
 }
 
+*/
 $css[]=TPLURL."/inc/css/usercss.css";
 include(TPLPATH.'/inc/header.tpl.php');
 ?>
@@ -96,7 +112,7 @@ $(function(){
 			});
 		}
     });
-	
+
 	$('.tubiao_closew').click(function(){
 	    $('.adminright_ts1').fadeOut('slow');
 		return false;
@@ -116,7 +132,7 @@ $(function(){
             <?php if($default_pwd!=''){?>
                 <div class="adminright_gg">
                     <div class="gonggaotubiao"></div>
-                    <b>提醒：</b> 您的本站原始密码为：<b style=' color:#F00;'><?=$default_pwd?></b> 为了您账号安全请及时修改！ 
+                    <b>提醒：</b> 您的本站原始密码为：<b style=' color:#F00;'><?=$default_pwd?></b> 为了您账号安全请及时修改！
                 </div>
              <?php }?>
              <?php include(TPLPATH."/user/notice.tpl.php");?>
@@ -128,21 +144,19 @@ $(function(){
                             <a href="<?=u('user','avatar')?>"><img src="<?=a($dduser['id'])?>" /></a>
                             <p><a href="<?=u('user','avatar')?>"> 修改头像</a></p>
                         </div>
-                      
-                      <div class="adminright_user_main_r">
-                          <p>可用余额：<span><?=$dduser['live_money']?></span> 元 (待结算：<?=$dduser['freeze_money']?> 元) <a href="<?=u('user','mingxi')?>"> 收入明细>></a> <?php if($webset['taoapi']['m2j']==1){?><a id="huanqian" style="cursor:pointer">转换成<?=TBMONEY?></a><?php }?></p>
-                          <?php if($webset['jifenbl']>0){?><p>可用积分：<span><?=$dduser['live_jifen']?></span> 点 (待结算：<?=$dduser['freeze_jifen']?> 点)    <a href="<?=u('user','huan')?>">兑换明细>></a></p><?php }?>
-                          <p>已提金额：<span><?=$dduser['yitixian']?> 元</span>&nbsp;&nbsp;&nbsp;&nbsp;已提<?=TBMONEY?>：<span><?=jfb_data_type($dduser['tbyitixian'])?></span> <?=TBMONEYUNIT?>    &nbsp;已兑换<?=TBMONEY?>：<span><?=(float)$spend_jifenbao?> <?=TBMONEYUNIT?></span><?php if($webset['jifenbl']>0){?>&nbsp;&nbsp;&nbsp;&nbsp;已兑换积分：<span><?=$spend_jifen?></span> 个<?php }?></p>
-						  <?php if(FANLI==1){?>
-                          <p>可用<?=TBMONEY?>：<span><?=$dduser['live_jifenbao']?></span> <?=TBMONEYUNIT?>(待结算：<?=$dduser['freeze_jifenbao']?> <?=TBMONEYUNIT?>) <a href="<?=u('user','mingxi')?>"> 收入明细>></a> <?php if(JIFENBAO==1){?>&nbsp;<a target="_blank" href="https://jf.alipay.com/prod/integral.htm">查看集分宝余额</a><?php }?> </p>
-                          <?php }?>
-                          <p>会员等级：<span><?=$dduser['level']?> <?=$dengji_img?></span>  <?php if($dd_tpl_data['jiaocheng']['dengji']!=''){?><a target="_blank" id="jiaocheng" href="<?=$dd_tpl_data['jiaocheng']['dengji']?>">关于等级？</a><?php }?></p>
-                      </div>
-                      
+
+						<div class="adminright_user_main_r">
+							<p>可用余额：<span><?=$dduser['live_money']?></span> 元 (未结算：<?=$dduser['freeze_money']?> 元) <a href="<?=u('user','mingxi')?>"> 收入明细>></a></p>
+							<p>购物返利<?=TBMONEY?>：<span><?=$dduser['live_jifenbao']?></span> <?=TBMONEYUNIT?>(未结算：<?=$dduser['freeze_jifenbao']?> <?=TBMONEYUNIT?>) <a href="<?=u('user','mingxi')?>"> 收入明细>></a> <?php if(JIFENBAO==1){?>&nbsp;<a target="_blank" href="https://jf.alipay.com/prod/integral.htm">查看集分宝余额</a><?php }?> </p>
+							<p>查询奖励<?=TBMONEY?>：<span><?=$dduser['search_jfb'] > 0 ? $dduser['search_jfb'] :0?></span> 个 (购物返利集分宝和查询集分宝1:1自动提取)    <a id="auto" href="/index.php?mod=user&act=info&do=caiwu">立即设置自动返利</a></p>
+							<p>已提金额：<span><?=$dduser['yitixian']?> 元</span>&nbsp;&nbsp;&nbsp;&nbsp;已提<?=TBMONEY?>：<span><?=jfb_data_type($dduser['tbyitixian'])?></span> <?=TBMONEYUNIT?>    &nbsp;</p>
+							<p>会员等级：<span><?=$dengji_img?></span> 当前VIP等级购物额外奖励:<span><?=$vip_bili?>集分宝</span> <?php if($jiaocheng['dengji']!=''){?><a target="_blank" id="jiaocheng" href="<?=$jiaocheng['dengji']?>">如何升级VIP?</a><?php }?>&nbsp;&nbsp;&nbsp;<a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=81cf3244f7167648ac0511558d25bbd1230bb386be887ac31a1b9148296d8af2"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="挖返利" title="挖返利"></a></p>
+						</div>
+
                     </div>
                     <div class="adminright_user_wei"></div>
                 </div>
-                
+
                 <?php if(FANLI==1){?>
                 <div class="adminright_yuye">
                     <div class="tishitubiao"></div>
@@ -152,13 +166,16 @@ $(function(){
                     <div class="tishitubiao"></div>
                     <p><?=$tbtxstate_msg?></p>
                 </div>
+				<div class="adminright_yuye">
+					<div class="tishitubiao"></div>
+					<p><?=$searchjfbstate_msg?></p>
+				</div>
+				<div class="adminright_qd">
+					<div class="tishitubiao"></div>
+					<p>亲！每天复制任意淘宝商品标题查询返利奖励10个<?=TBMONEY?>,<a style="font-size: 14px;color: red;" href="http://www.wafanli.cn" target="_self">点击这里去首页查返利拿奖励</a></p>
+				</div>
                 <?php }?>
-                <?php if($webset['sign']['open']==1){?>
-                <div class="adminright_qd">
-                    <div class="tishitubiao"></div>
-                    <p><?=$sign_word?></p>
-                </div>
-                <?php }?>
+
                 <?php if($api_login_tip || $caiwu_tip || $mobile_tip || $tbnick_tip){?>
                 <div class="adminright_ts1">
                 	<div class="tubiao_tishi"></div>
@@ -182,7 +199,7 @@ $(function(){
                 <?php }?>
                 </div>
             </div>
-        
+
         </div>
   </div>
 </div>
@@ -199,16 +216,16 @@ function jsJfb(v){
 }
 
 $(function(){
-    $('#huanqian').jumpBox({  
+    $('#huanqian').jumpBox({
 	    title: '温馨提示：按照1比<?=TBMONEYBL?>的比例将人民币转换成<?=TBMONEY?>！<?php if(JFB_FEE>0){?><?=TBMONEY?>兑换需要额外支付<b style=" color:red"><?=JFB_FEE*100?>%</b>的手续费<?php }?>',
 		titlebg:1,
 		height:200,
 		width:580,
 		defaultContain:1
     });
-	
+
 	jsJfb(<?=$dduser['live_money']?>);
-	
+
 	$('#money').keyup(function(){
 		var liveMoney=<?=$dduser['live_money']?>;
 		var v=parseFloat($(this).val());
@@ -220,7 +237,7 @@ $(function(){
 			jsJfb(v);
 		}
 	});
-	
+
 	$('#form1').submit(function(){
 		$(this).find('.ShiftClass').attr('disabled','disabled');
 		var v=$(this).find('#money').val();

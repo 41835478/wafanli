@@ -48,7 +48,7 @@ h3{font-family:"黑体";font-size:13px;}
 	padding:0;
 	text-align:left;
 	height:32px;
-	width:500px;
+	width:570px;
 	float:left;
 	}
 .topleft .topleftA {height:20px; margin:0; padding:0px; padding-top:10px; float:left; display:block;}
@@ -63,7 +63,7 @@ h3{font-family:"黑体";font-size:13px;}
 	padding:0;
 	text-align:left;
 	height:32px;
-	width:500px;
+	width:430px;
 	float:right;}
 .topright  a:link,a:visited {font-size:12px;text-decoration:none;}
 .topright  a:hover{color: #FF6600;	text-decoration: underline;}

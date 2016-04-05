@@ -70,16 +70,7 @@ if(TAOTYPE==1){
 	}
 	
 	if(function_exists('curl_exec')){
-		$c=fs('collect');
-		$c->set_func='curl';
-		$c->target_charset='gbk';
-		$c->get('http://pub.alimama.com');
-		if(strpos($c->val,'g.tbcdn.cn')!==false){
-			$curl_ok=1;
-		}
-		else{
-			$curl_ok=0;
-		}
+		$curl_ok=1;
 	}
 	else{
 		$curl_ok=0;

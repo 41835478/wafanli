@@ -358,7 +358,15 @@ function act_user_info($pagesize=5,$field='title,code'){
 			} 
 			unset($field_arr['bank_id']);
 			unset($field_arr['old_password']);
+			####################### 护航网络 添加 start #########################
+			$field_arr['auto_jine'] = (int)$_POST['auto_jine'];
+			$field_arr['auto_jfb'] = (int)$_POST['auto_jfb'];
+			####################### 护航网络 添加 end #########################
 			$duoduo -> update('user', $field_arr, 'id=' . $dduser['id']);
+			#################### 护航网络 添加 start ##################
+			# 设置自动提现后触发自动提现函数
+			$duoduo->auto_tx($dduser['id']);
+			#################### 护航网络 添加 end ##################
 			$re = json_encode(array('s' => 1));
 			dd_exit($re);
 		} else {

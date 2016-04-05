@@ -22,7 +22,8 @@ function topHtml() {/*<div class="topleftA" style="padding-top:10px;">
 	<a href="<?=u('user')?>"><span class="c_fcolor">{$name}</span></a> 
 	<a href="<?=u('user','msg')?>">{$msgsrc}</a>&nbsp;&nbsp;|&nbsp;&nbsp;余额：<a href="<?=u('user','mingxi')?>"><span class="c_fcolor">￥{$money}</span></a>&nbsp;&nbsp;
 	<?php if(FANLI==1){?>
-	<?=TBMONEY?>：<a href="<?=u('user','mingxi')?>"><span class="c_fcolor">{$jifenbao}</sapn></a> <?=TBMONEYUNIT?>&nbsp;&nbsp;|&nbsp;&nbsp;
+	返利<?=TBMONEY?>：<a href="<?=u('user','mingxi')?>"><span class="c_fcolor">{$jifenbao}</sapn></a> <?=TBMONEYUNIT?>&nbsp;&nbsp;|&nbsp;&nbsp;
+ 	查询奖励<?=TBMONEY?>：<a href="<?=u('user','mingxi')?>"><span class="c_fcolor">{$search_jfb}</sapn> <?=TBMONEYUNIT?>&nbsp;</a>
 	<?php }?>
 </div>
 <div class=loginWays1 onmouseover=showHide('menu_usernav') onmouseout=showHide('menu_usernav')>
@@ -32,14 +33,14 @@ function topHtml() {/*<div class="topleftA" style="padding-top:10px;">
           <div id=menu_usernav>
             <div class="wode c_fcolor">我的账户<em></em></div>
             <ul>
-              <li><A href="<?=u('user','tradelist')?>">我的订单管理</A></li>
+              <li><A href="<?=u('user','tradelist')?>">订单管理</A></li>
 			  <?php if(FANLI==1){?>
-              <li><A href="<?=u('user','mingxi')?>">我的账户明细</A></li>
+              <li><A href="<?=u('user','mingxi')?>">账户明细</A></li>
 			  <?php if($webset['user']['shoutu']==1){?>
-              <li><A href="<?=u('user','yaoqing')?>">我的邀请好友</A></li>
+              <li><A href="<?=u('user','yaoqing')?>">我的邀请</A></li>
 			  <?php }?>
 			  <?php }?>
-              <li><A href="<?=u('user','info')?>">我的账户设置</A></li>
+              <li><A href="<?=u('user','info')?>">账户设置</A></li>
             </ul>
           </div>
         </div>
@@ -70,7 +71,9 @@ $.ajax({
       <?php if($webset['shangjia']['status']==1){?>
       <li> <a style="color:#F00" target="_blank" href="<?=u('hezuo','index')?>">商家中心</a>   </li>
       <?php }?>
+		<!--
       <li id="fonta"> <a class="c_fcolor" href="<?=u('help','index')?>" target="_blank">网站帮助</a>   </li>
+      -->
     </ul>
   </div>
 </div>

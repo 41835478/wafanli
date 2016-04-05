@@ -16,10 +16,10 @@ include(TPLPATH.'/inc/header.tpl.php');
                 <?php include(TPLPATH."/user/notice.tpl.php");?>
                 <div class="admin_xfl">
                     <ul>
-                    <li id="in"><a href="<?=u('user','mingxi',array('do'=>'in'))?>">我的收入明细</a> </li>
-                    <li id="out" ><a href="<?=u('user','mingxi',array('do'=>'out'))?>">我的提取明细</a> </li>
-                    <li id="tui" ><a href="<?=u('user','mingxi',array('do'=>'tui'))?>">我的退款明细</a> </li>
-                    <li id="kou" ><a href="<?=u('user','mingxi',array('do'=>'kou'))?>">我的扣除明细</a> </li>
+                    <li id="in"><a href="<?=u('user','mingxi',array('do'=>'in'))?>">收入明细</a> </li>
+                    <li id="out" ><a href="<?=u('user','mingxi',array('do'=>'out'))?>">提取明细</a> </li>
+                    <li id="tui" ><a href="<?=u('user','mingxi',array('do'=>'tui'))?>">退款明细</a> </li>
+                    <li id="kou" ><a href="<?=u('user','mingxi',array('do'=>'kou'))?>">扣除明细</a> </li>
                     </ul>
                     <script>
                     $(function(){

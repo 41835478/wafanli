@@ -44,6 +44,61 @@ function dd_act(){
 	}
 	$q=trim($_GET['q']);
 	if($q!=''){
+
+		####################### 护航网络 修改 start #########################
+		$parameter['jfb'] = 0;
+		//if($duoduo->dduser['id'] && isset($_GET['view']) && strpos($_SERVER['HTTP_REFERER'],SITEURL) === 0){
+		if($duoduo->dduser['id']){
+			//今天0点时间
+			$t0 = strtotime(date('Y-m-d'));
+			//得到用户今天的搜索记录
+			$get = $duoduo->select_all('search_rows','*','addtime >= '.$t0.' and uid = '.$duoduo->dduser['id']);
+			$get_jfb = 0;	//今天得到集分宝
+			if($get){
+				foreach($get as $v){
+					$get_jfb += $v['jfb'];
+				}
+			}
+			//每天最多得到集分宝数$webset['sign']['jifenbao']是后台设置的签到集分宝个数
+			if($duoduo->dduser['level']<3){
+				$max_jfb=5;
+			}else{
+				$max_jfb=$webset['sign']['jifenbao'];
+			}
+			//$max_jfb = $webset['sign']['jifenbao'];
+			$jfb = 0;
+			if($get_jfb < $max_jfb){
+				//本次得到集分宝数
+				if($duoduo->dduser['level']<3){
+					$jfb=5;
+				}else{
+					$jfb = $webset['sign']['jifenbao'];
+				}
+				//$jfb = $webset['sign']['jifenbao'];
+
+				$ins['addtime'] = $_SERVER['REQUEST_TIME'];
+				$ins['uid'] = $duoduo->dduser['id'];
+				$ins['jfb'] = $jfb;
+				//插入搜索记录
+				$jg = $duoduo->insert('search_rows',$ins);
+				if($jg){	//更新用户集分宝
+					$up_jfb = $duoduo->dduser['search_jfb'] + $jfb;	//搜索总集分宝
+					$user_jfb = $duoduo->dduser['jifenbao'];	//用户当前集分宝
+					//更新用户集分宝
+					$duoduo->update('user',array('search_jfb'=>$up_jfb,'jifenbao'=>$user_jfb),'id='.$duoduo->dduser['id']);
+					//插入明细
+					$mx['shijian'] = 29;
+					$mx['uid'] = $duoduo->dduser['id'];
+					$mx['addtime'] = date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']);
+					$mx['jifenbao'] = $jfb;
+					$mx['leave_jifenbao'] = $user_jfb;
+					$duoduo->insert('mingxi',$mx);
+				}
+			}
+			$parameter['jfb'] = $jfb;
+		}
+		####################### 护航网络 修改 end #########################
+
 		$is_url=reg_taobao_url($q);
 	}
 

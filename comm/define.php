@@ -1,5 +1,5 @@
 <?php //常量定义
-define('WEB_USER_LEVEL',4);
+define('WEB_USER_LEVEL',7);
 define('TAO_FREEZE_DAY',16);
 define('DEFAULTPWD','123duoduo321');
 define('CHANET_GET_KEY_URL','http://www.chanet.com.cn/api/pt/duoduo_bind.cgi');

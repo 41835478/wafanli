@@ -28,9 +28,33 @@ function act_user_index(){
 	$data=array('lastlogintime'=>SJ);
 	$duoduo->update('user',$data,'id="'.$dduser['id'].'"');
 	unset($data);
-	
-	$dengji_img = "<img src='images/v".$dduser['type'].".gif' alt='".$v."' />";
-	
+
+	#########   护航网络 start  ###########
+	// $dengji_img = "<img src='images/v".$dduser['type'].".gif' alt='".$v."' />";
+	$web_level=back_arr($webset['level']);
+	foreach($webset['level'] as $k=>$v ){//帐号类型
+		$user_level_type[$k]=$v['title'];
+	}
+	$m=WEB_USER_LEVEL-1;
+	$jingyan=$dduser['level'];  //qianli 计算当前用户经验值
+	foreach($web_level as $k=>$v){
+		if($dduser['level']>=$k){
+			$dengji_img = $v['title']."(经验值:$jingyan)";
+			break;
+		}
+		$m--;
+	}
+
+	//护航网络 计算VIP额外返利比例
+	$vip_bl=$webset['paipaifxbl'];
+	foreach($vip_bl as $k=>$v){
+		if($dduser['level']>=$k){
+			$vip_bili=($v*100)."%";
+			break;
+		}
+		$m--;
+	}
+	#########   护航网络 end  ###########
 	$default_pwd=$dd_user_class->get_default_pwd($dduser['id']);
 	
 	$sign=0;
@@ -76,7 +100,23 @@ function act_user_index(){
 	else{
 		$tbnick_tip=0;
 	}
-	
+	####################### 护航网络 添加 start ##########################
+	#当用户登陆用户中心后，集分宝大于0并且设置了自动提现执行自动提现
+//    if($dduser['jifenbao']>0 && $dduser['auto_jfb']>0){
+//        //获取当天时间
+//        $t1 = strtotime(date('Y-m-d'));
+//        //获取用户当天提现失败次数
+//        $auto_count= $duoduo->count('tixian','addtime >= '.$t1.' and status=2 and uid = '.$duoduo->dduser['id'] );
+//        if($auto_count<1){
+//            $duoduo->auto_tx($dduser['id']);
+//
+//        }
+//    }
+	if($dduser['jifenbao']>0 && $dduser['auto_jfb']>0){
+		$duoduo->auto_tx($dduser['id']);
+	}
+
+	####################### 护航网络 添加 end ##########################
 	unset($duoduo);
 	$parameter['spend_jifenbao']=$spend_jifenbao;
 	$parameter['spend_jifen']=$spend_jifen;
@@ -92,6 +132,7 @@ function act_user_index(){
 	$parameter['tbnick_tip']=$tbnick_tip;
 	$parameter['sign']=$sign;
 	$parameter['dengji_img']=$dengji_img;
+	$parameter['vip_bili']=$vip_bili;
 	return $parameter;
 }
 ?>

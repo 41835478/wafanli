@@ -1163,6 +1163,7 @@ function set_constants($table) {
 		if(isset($trade['trade_id'])){
 		    $dingdan='taobao';
 			$fxbl=$this->webset['fxbl'];
+			$vip_fxbl=$this->webset['paipaifxbl'];  //护航网络增加
 			$trade_id=TAOTYPE==1?$trade['trade_id_former']:$trade['trade_id'];
 			
 			if($trade['commission']==0){
@@ -1170,7 +1171,11 @@ function set_constants($table) {
 			}
 			if(!isset($trade['fxje']) || $trade['fxje']==0){
 				$trade['fxje']=fenduan($trade['commission'], $this->webset['fxbl'], $user['type']);
+				//护航网络增加
+				$trade['vip_fxje']=fenduan($trade['fxje'],$this->webset['paipaifxbl'],$user['type']);
 				$trade['jifenbao']=jfb_data_type($trade['fxje'] * TBMONEYBL);
+				//护航网络增加
+				$trade['vip_jifenbao']=jfb_data_type($trade['vip_fxje'] * TBMONEYBL);
 				$trade['jifen']=(int)($trade['fxje'] * $this->webset['jifenbl']);
 			}
 		}
@@ -1200,15 +1205,18 @@ function set_constants($table) {
 		    
 			if(isset($trade['order_code'])){
 				$fxje=$trade['fxje'];
+				$vip_fxje=$trade['vip_fxje'];  //护航网络增加
 				$jifen=$trade['jifen'];
 			}
 			else{
 				$fxje=fenduan($trade['commission'],$fxbl,$user['type']);
+				$vip_fxje=fenduan($fxje,$vip_fxbl,$user['type']); //护航网络增加
 				$jifen=round($fxje*$this->webset['jifenbl']);
 			}
 
 			if($trade['fxje']==0){
 				$fxje=0;
+				$vip_fxje=0;  //护航网络添加
 			}
 			
 			if($have_tgyj==1){
@@ -1218,7 +1226,8 @@ function set_constants($table) {
 			//判断是淘宝订单还是商城订单
 		    if($dingdan=='taobao'){
 				$jifenbao=jfb_data_type($fxje*TBMONEYBL);  //集分宝格式化
-		        $data=array('fxje'=>$fxje,'jifenbao'=>$jifenbao,'jifen'=>$jifen,'tgyj'=>$tgyj,'qrsj'=>TIME,'outer_code'=>$user['id'],'uid'=>$user['id'],'checked'=>2,'status'=>5);
+				$vip_jifenbao=jfb_data_type($vip_fxje*TBMONEYBL);//护航网络增加
+		        $data=array('fxje'=>$fxje,'vip_fxje'=>$vip_fxje,'jifenbao'=>$jifenbao,'vip_jifenbao'=>$vip_jifenbao,'jifen'=>$jifen,'tgyj'=>$tgyj,'qrsj'=>TIME,'outer_code'=>$user['id'],'uid'=>$user['id'],'checked'=>2,'status'=>5);
 				if(array_key_exists('ddjt',$trade)){
 				    $data['ddjt']=$trade['ddjt'];
 				}
@@ -1241,8 +1250,10 @@ function set_constants($table) {
 		}
 		else{
 		    $fxje=$trade['fxje'];
+			$vip_fxje=$trade['vip_fxje']; //护航网络增加
 		    $jifen=$trade['jifen'];
-			$jifenbao=$trade['jifenbao'];	
+			$jifenbao=$trade['jifenbao'];
+			$vip_jifenbao=$trade['vip_jifenbao'];  //护航网络添加
 			if($have_tgyj==1){
 				$tgyj=round($fxje*$this->webset['tgbl'],2);
 			}
@@ -1251,10 +1262,13 @@ function set_constants($table) {
 	
 		//给会员加返利，等级，积分
 		$set_con_arr=array(array('f'=>'money','v'=>$fxje,'e'=>'+'),array('f'=>'level','v'=>1,'e'=>'+'),array('f'=>'jifen','v'=>$jifen,'e'=>'+'));
+		$vip_data=array(array('f'=>'money','v'=>$vip_fxje,'e'=>'+')); //护航网络增加
 		
 		if($dingdan=='taobao'){  //淘宝订单返的是集分宝
 			$set_con_arr[0]['f']='jifenbao';
 			$set_con_arr[0]['v']=$jifenbao;
+			$vip_data[0]['f']='jifenbao';//护航网络增加
+			$vip_data[0]['v']=$vip_jifenbao;//护航网络增加
 		}
 		
 		if($trade['commission']>=$this->webset['taoapi']['freeze_limit'] && $this->webset['taoapi']['freeze']==1 && $dingdan=='taobao'){ //淘宝订单有冻结返利
@@ -1267,7 +1281,12 @@ function set_constants($table) {
 		$this->update_user_mingxi($set_con_arr, $user['id'],$shijian,$trade_id,0,$freeze,$trade['pay_time'],$trade['relate_id']); //冻结佣金，带有下单时间
 		//推广佣金
 		$this->tgfz($tgyj,$user['tjr'],$user['id'],$user['name'],$trade['relate_id'],$trade['pay_time'],$freeze);
-
+		//VIP等级奖励更新 护航网络增加
+		$this->update_user_mingxi($vip_data, $user['id'],31,$trade_id,0,$freeze,$trade['pay_time'],$trade['relate_id']);
+		#################### 护航网络 添加 start ################
+		# 自动提现任务 2016年4月5日设置停止获取订单后自动返利,登录会员中心自动返利
+		// $this->auto_tx($user['id']);
+		#################### 护航网络 添加 end ##################
 		if($table_name=='mall_order'){
 			$this->ddtuiguang($user['id'],$trade['relate_id'],$fxje,$table_name);
 		}
@@ -1428,17 +1447,18 @@ function set_constants($table) {
 	}
 	
 	function refund($id,$do=1){
-	    $trade=$this->select('tradelist','id,num_iid,item_title,outer_code,checked,fxje,jifenbao,jifen,tgyj,trade_id,commission,uid,pay_time,checked','id="'.$id.'"');
+		//护航网络增加 vip_jifenbao vip_fxje
+	    $trade=$this->select('tradelist','id,num_iid,item_title,outer_code,checked,fxje,vip_fxje,jifenbao,vip_jifenbao,jifen,tgyj,trade_id,commission,uid,pay_time,checked','id="'.$id.'"');
 		$trade_id=preg_replace('/_\d+/','',$trade['trade_id']);
 		
 		if($trade['id']>0 && $trade['uid']>0 && $trade['checked']==2){
 		    $user=$this->select('user','ddusername,tjr,txstatus,tbtxstatus,money,jifenbao,dhstate,email,mobile,mobile_test','id="'.$trade['uid'].'"');
 			if($user['ddusername']!=''){ //会员存在，剪掉金额，积分，等级
 				if($trade['jifenbao']>0){
-					$data=array(array('f'=>'jifenbao','e'=>'+','v'=>-$trade['jifenbao']));
+					$data=array(array('f'=>'jifenbao','e'=>'+','v'=>-($trade['jifenbao']+$trade['vip_jifenbao'])));
 				}
 				elseif($trade['fxje']>0){
-					$data=array(array('f'=>'money','e'=>'+','v'=>-$trade['fxje']));
+					$data=array(array('f'=>'money','e'=>'+','v'=>-$trade['fxje']),array('f'=>'money','e'=>'+','v'=>-$trade['vip_fxje']));
 				}
 				$data[]=array('f'=>'jifen','e'=>'+','v'=>-$trade['jifen']);
 				$data[]=array('f'=>'level','e'=>'-','v'=>1);
@@ -2095,6 +2115,15 @@ function set_constants($table) {
 				$api=$ddopen->cancel_jifenbao($id);
 			}
 			$user_data[]=array('f'=>$money_f,'e'=>'+','v'=>$money);
+			########################## 护航网络 添加 start ########################
+			# 当前退回体现时将搜索和签到所的集分宝还原
+			if($row['type'] == 1){
+				$user=$this->select('user','search_jfb,search_jfb2,jifenbao','id="'.$row['uid'].'"');
+				$user_data[] = array('f'=>'jifenbao','e'=>'-','v'=>$user['search_jfb2']);
+				$user_data[] = array('f'=>'search_jfb','e'=>'+','v'=>$user['search_jfb2']);
+				$user_data[] = array('f'=>'search_jfb2','e'=>'=','v'=>0);
+			}
+			########################## 护航网络 添加 end ########################
 			$msg_data['why']=$_POST['why'];
 			$msg=$this->msg_insert($msg_data,3); //提现失败3号站内信
 			$data[]=array('f'=>'status','e'=>'=','v'=>'2');
@@ -2261,7 +2290,7 @@ function set_constants($table) {
 			sort($_shuju);
 			unset($shuju);
 			foreach($_shuju as $k=>$row){
-				$shuju[$k]=array(1=>$row[1],2=>'淘宝订单',6=>1,7=>0,8=>$row[3],15=>$row[5],11=>0,12=>0,16=>0,3=>0,4=>'淘宝掌柜',5=>'淘宝掌柜',14=>$row[6]?$row[6]:$row[4],18=>0,19=>0,23=>$row[2]);
+				$shuju[$k]=array(1=>$row[1],2=>'淘宝订单',3=>0,4=>'淘宝掌柜',5=>'淘宝掌柜',6=>1,7=>0,8=>$row[3],11=>0,12=>0,13=>$row[4],15=>$row[6],16=>$row[5],18=>$row[6],19=>0,20=>0,24=>$row[2]);
 			}
 		}
 		
@@ -2342,12 +2371,7 @@ function set_constants($table) {
 			
 			$arr['commission']=0;
 			if($arr['status']==5){
-				if($row[$commission_yongjin_key]>0){
-					$arr['commission'] =(float)$row[$commission_yongjin_key];
-				}
-				else{
-					$arr['commission'] =(float)$row[$commission_key];
-				}
+				$arr['commission'] =(float)$row[$commission_key];
 			}
 			else{
 				if($row[$yugu_key]>0){
@@ -2750,7 +2774,153 @@ function set_constants($table) {
 			}
 		}
 	}
-	
+
+	####################### 护航网络 添加 start ##########################
+	# 自动给会员提现
+	function auto_tx($uid=0){
+
+		$uid = (int)$uid;
+		$user = $this->select('user','*','id='.$uid);
+
+		//用户存在 ，真实名存在，支付宝存在，满足体现要求
+		if($user && $user['realname'] && $user['alipay'] && $this->webset['tixian']['level'] <= $user['level'] && $user['mobile']>0){
+
+			//判断体现状态
+			if(!$user['txstatus'] && $user['auto_jine'] && $user['auto_jine'] <= $user['money']){	//金额是否可体现
+
+				//	$txnum = intval($user['money']/$this->webset['tixian']['txxz'])*$this->webset['tixian']['txxz'];
+
+				//	$txnum = $txnum > $this->webset['tixian']['limit'] ? $this->webset['tixian']['limit'] : $txnum;
+
+				$txnum = $user['money'];
+
+
+				$data = array (
+					'uid' => $user['id'],
+					'money' => $txnum,
+					'addtime' => TIME,
+					'ip' => get_client_ip(),
+					'realname' => $user['realname'],
+					'remark' => '自动提现',
+					'mobile' => $user['mobile'],
+					'status' => 0,
+					'type' => 2,
+					'code' => $user['alipay'],
+					'tool' => 1,
+					'money2' => $txnum,
+				);
+
+				$user_data = array();
+				$user_data[] = array (
+					'f' => 'money',
+					'e' => '-',
+					'v' => $txnum
+				);
+				$user_data[] = array (
+					'f' => 'lasttixian',
+					'e' => '=',
+					'v' => TIME
+				);
+				$user_data[] = array (
+					'f' => 'txstatus',
+					'e' => '=',
+					'v' => 1
+				);
+
+				$this->update('user', $user_data, 'id="' . $user['id'] . '"');
+				$this->insert('tixian', $data);
+
+				//echo '金额可体现:'.$txnum.'<br />';
+			}
+
+
+			//判断提现状态、是否设置自动提现、手机号是否填写
+			if(!$user['tbtxstatus'] && $user['auto_jfb'] && $user['auto_jfb'] <= $user['jifenbao'] && $user['mobile']>0){	//集分宝是否可体现
+
+				//购物集分宝大于等于签到和搜索所得积分宝
+				if($user['jifenbao']>0){
+
+					//	$txnum = intval($user['jifenbao']/$this->webset['tixian']['tbtxxz'])*$this->webset['tixian']['tbtxxz'];
+					//	$txnum = $txnum > $this->webset['tixian']['tblimit'] ? $this->webset['tixian']['tblimit'] : $txnum;
+
+					if($user['jifenbao']>=$user['search_jfb'])
+					{
+						$txnum=$user['search_jfb']+$user['jifenbao'];
+					}
+					else
+
+					{
+						$txnum=$user['jifenbao']+$user['jifenbao'];
+					}
+
+					$data = array (
+						'uid' => $user['id'],
+						'money' => $txnum,
+						'addtime' => TIME,
+						'ip' => get_client_ip(),
+						'realname' => $user['realname'],
+						'remark' => '自动提现',
+						'mobile' => $user['mobile'],
+						'status' => 0,
+						'type' => 1,
+						'code' => $user['alipay'],
+						'tool' => 1,
+						'money2' => $txnum,
+						'money3' =>$user['search_jfb2']
+					);
+
+					$user_data = array();
+					$user_data[] = array (
+						'f' => 'jifenbao',
+						'e' => '-',
+						'v' => $user['jifenbao']
+					);
+					$user_data[] = array (
+						'f' => 'lasttixian',
+						'e' => '=',
+						'v' => TIME
+					);
+					$user_data[] = array (
+						'f' => 'tbtxstatus',
+						'e' => '=',
+						'v' => 1
+					);
+
+					//清楚搜索和签到所得积分
+
+
+					if($user['jifenbao']>=$user['search_jfb'])
+					{
+						$search_jfb=$user['search_jfb'];
+					}
+					else
+					{
+						$search_jfb=$user['jifenbao'];
+					}
+
+					$user_data[] = array (
+						'f' => 'search_jfb',
+						'e' => '-',
+						'v' => $search_jfb
+					);
+					$user_data[] = array (
+						'f' => 'search_jfb2',
+						'e' => '=',
+						'v' => $search_jfb
+					);
+
+
+					$this->update('user', $user_data, 'id="' . $user['id'] . '"');
+					$this->insert('tixian', $data);
+					//echo '淘宝可体现:'.$txnum;
+				}
+			}
+
+		}
+
+	}
+	####################### 护航网络 添加 end ##########################
+
 	function get_user(){
 		$userlogininfo=unserialize(get_cookie('userlogininfo')); 
 		$hcookieuid = $userlogininfo['uid']; 

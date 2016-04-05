@@ -121,7 +121,7 @@ switch($act){
             }else{
 	            $msgsrc="<img src=\"template/".MOBAN."/inc/images/msg0.gif\" border=\"0\" alt=\"您有新的短消息\" /> (".$msgnum.")";
             }
-			$userinfo=array('name'=>$dduser['name'],'id'=>$dduser['id'],'money'=>$dduser['money'],'jifenbao'=>$dduser['jifenbao'],'jifen'=>$dduser['jifen'],'level'=>$dduser['level'],'msgsrc'=>$msgsrc,'avatar'=>a($dduser['id']));
+			$userinfo=array('name'=>$dduser['name'],'id'=>$dduser['id'],'money'=>$dduser['money'],'jifenbao'=>$dduser['jifenbao'],'search_jfb'=>$dduser['search_jfb'] > 0 ? $dduser['search_jfb'] :0,'jifen'=>$dduser['jifen'],'level'=>$dduser['level'],'msgsrc'=>$msgsrc,'avatar'=>a($dduser['id']));
 			$re=array('s'=>1,'user'=>$userinfo);
 		    echo dd_json_encode($re);
 		}

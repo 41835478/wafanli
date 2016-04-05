@@ -53,17 +53,14 @@ function checkTradelist(){
                 <form action="<?=CURURL?>" onsubmit="return checkTradelist()">
                 <input type="hidden" name="mod" value="user" /><input type="hidden" name="act" value="tradelist" />
                   <input class="admin_searchx_input1" type="text" id="q" name="q" value="<?=$q?$q:'输入订单号'?>" onclick="this.value=''" />
-                  <?=select($do_arr,$do,'do')?><input class="admin_searchx_b c_bgcolor" type="submit" value="查找遗漏订单" style="margin-left:10px; font-size:12px;" /></form>
+                  <?=select($do_arr,$do,'do')?><input class="admin_searchx_b c_bgcolor" type="submit" value="丢单找回" style="margin-left:10px; font-size:12px;" /></form>
                 </div>
                 <div class="admin_xfl">
                     <ul>
-                    <li id="taobao" class="taobao lost"><a href="<?=u('user','tradelist',array('do'=>'taobao'))?>">我的淘宝订单</a> </li>
-                    <?php if($webset['paipai']['open']==1){?>
-                    <li id="paipai" class="paipai paipailost"><a href="<?=u('user','tradelist',array('do'=>'paipai'))?>">我的拍拍订单</a> </li>
-                    <?php }?>
-                    <li id="mall" class="mall malllost"><a href="<?=u('user','tradelist',array('do'=>'mall'))?>">我的商城订单</a> </li>
+                    <li id="taobao" class="taobao lost"><a href="<?=u('user','tradelist',array('do'=>'taobao'))?>">淘宝订单</a> </li>
+                    <li id="mall" class="mall malllost"><a href="<?=u('user','tradelist',array('do'=>'mall'))?>">商城订单</a> </li>
                      <?php if($webset['offer']['status']==1 || $webset['gametask']['status']==1 || $webset['douwantask']['status']==1){?>
-                    <li id="task" class="task"><a href="<?=u('user','tradelist',array('do'=>'task'))?>">我的任务订单</a> </li>
+                    <!--<li id="task" class="task"><a href="<?=u('user','tradelist',array('do'=>'task'))?>">我的任务订单</a> </li>-->
                     <?php }?>
                     <?php if(FANLI==1){?><li id="checked"><a href="<?=u('user','tradelist',array('do'=>'checked'))?>">待审核订单</a> </li><?php }?>
                     </ul>
@@ -75,11 +72,10 @@ function checkTradelist(){
                       <tr>
                         <th width="120" height="26">订单号</th>
                         <th>宝贝名称</th>
-                        <th width="73">金额</th>
-                        <?php if(FANLI==1){?><th width="70">返</th><?php }?>
+                        <th width="73">VIP奖励</th>
+                        <?php if(FANLI==1){?><th width="70">订单返利</th><?php }?>
                         <th width="80"><?php if(TAOTYPE==2){?>结算时间<?php }else{?>下单时间<?php }?></th>
                         <?php if(TAOTYPE==1){?><th width="80">状态</th><?php }?>
-                        <th width="100">晒单</th>
                       </tr>
                       <?php foreach ($dingdan as $r){?>
                       <?php if(TAOTYPE==2){?>
@@ -90,7 +86,7 @@ function checkTradelist(){
                         <?php if(FANLI==1){?><td><?=$r["jifenbao"]>0?jfb_data_type($r["jifenbao"]).TBMONEY:$r["fxje"].'元'?></td><?php }?>
                         <td><?=date('Y-m-d',strtotime($r["pay_time"]))?></td>
                         <?php if($r["pay_time"]>=$webset['baobei']['shai_s_time']){?>
-							<?php if($r["baobei_id"]>0){?> 
+							<?php if($r["baobei_id"]>0){?>
                             <td trade_id='<?=$r["id"]?>' iid='<?=$r["num_iid"]?>' trade_title='<?=$r["item_title"]?>' userimg='<?=$r["baobei_userimg"]?>' cid='<?=$r["baobei_cid"]?>' comment='<?=$r["baobei_content"]?>' reason='拒绝原因：<?=$r["baobei_reason"]?>' title='<?=$r["baobei_status"]==1?$r["baobei_reason"]:$shai_word[$r["baobei_status"]]?>' style=" <?=$b_status_color_arr[$r['baobei_status']]?>"><?=$b_status_arr[$r['baobei_status']]?>&nbsp;<?php if($r["baobei_status"]==0){?><a href="<?=u('baobei','view',array('id'=>$r["baobei_id"]))?>" target="_blank">查看</a> <?php }elseif($r["baobei_status"]==1){?><b class="reshai" style="cursor:pointer;font-weight:normal">查看</b><?php }?></td>
                             <?php }else{?>
                             <td trade_id='<?=$r["id"]?>' iid='<?=$r["num_iid"]?>' trade_title='<?=$r["item_title"]?>' title='<?=$shai_title?>'><?=$shai_tip[$r["baobei_id"]?1:0]?></td>
@@ -103,7 +99,7 @@ function checkTradelist(){
                       <tr>
                         <td height="33"><?=$r["trade_id_former"]?$r["trade_id_former"]:$r["trade_id"]?></td>
                         <td><div class="ddnowrap" style="width:230px" title="<?=$r["item_title"]?>"><?=$r["item_title"]?></div></td>
-                        <td><?=$r["real_pay_fee"]>0?$r["real_pay_fee"]:'等待结算'?></td>
+                        <td><?=$r["jifenbao"]>0?jfb_data_type($r["vip_jifenbao"]).TBMONEY:'等待结算'?></td>
                         <?php if(FANLI==1){?>
 						<?php if($r["status"]==4){?>
                         <td><span style="color:red">无</span></td>
@@ -116,22 +112,7 @@ function checkTradelist(){
                         <td><?=date('Y-m-d',strtotime($r["create_time"]>0?$r["create_time"]:$r["pay_time"]))?></td>
                         
                         <?php if(TAOTYPE==1){?><td><?=$tb_status_arr[$r["status"]]?></td><?php }?>
-                        
-                        <?php if($r["status"]==4){?>
-                        <td>——</td>
-                        <?php }elseif($r["pay_time"]>=$webset['baobei']['shai_s_time']){?>
-                        	<?php if($r["checked"]==2){?>
-								 <?php if($r["baobei_id"]>0){?> 
-                                <td trade_id='<?=$r["id"]?>' iid='<?=$r["num_iid"]?>' trade_title='<?=$r["item_title"]?>' userimg='<?=$r["baobei_userimg"]?>' cid='<?=$r["baobei_cid"]?>' comment='<?=$r["baobei_content"]?>' reason='拒绝原因：<?=$r["baobei_reason"]?>' title='<?=$r["baobei_status"]==1?$r["baobei_reason"]:$shai_word[$r["baobei_status"]]?>' style=" <?=$b_status_color_arr[$r['baobei_status']]?>"><?=$b_status_arr[$r['baobei_status']]?>&nbsp;<?php if($r["baobei_status"]==0){?><a href="<?=u('baobei','view',array('id'=>$r["baobei_id"]))?>" target="_blank">查看</a> <?php }elseif($r["baobei_status"]==1){?><b class="reshai" style="cursor:pointer;font-weight:normal">查看</b><?php }?></td>
-                                <?php }else{?>
-                                <td trade_id='<?=$r["id"]?>' iid='<?=$r["num_iid"]?>' trade_title='<?=$r["item_title"]?>' title='<?=$shai_title?>'><?=$shai_tip[$r["baobei_id"]?1:0]?></td>
-                                <?php }?>
-                        	<?php }else{?>
-                        	<td>待审核</td>
-                        	<?php }?>
-                         <?php }else{?>
-                        <td><span style="color:#F00">待结算</span></td>
-                        <?php }?>
+
                       </tr>
                       <?php }?>
                       <?php }?>
@@ -146,7 +127,7 @@ function checkTradelist(){
                         <th width="60">数量</th>
                         <?php }else{?>
                         <th width="60">金额</th>
-                        <?php if(FANLI==1){?><th width="60">返</th><?php }?>
+                        <?php if(FANLI==1){?><th width="60">订单返利</th><?php }?>
                         <?php }?>
                         <th width="80">下单时间</th>
                         <th width="80">找回订单</th>
@@ -183,7 +164,7 @@ function checkTradelist(){
                         <th width="120" height="26">订单号</th>
                         <th>宝贝名称</th>
                         <th width="60">金额</th>
-                        <?php if(FANLI==1){?><th width="60">返</th><?php }?>
+                        <?php if(FANLI==1){?><th width="60">订单返利</th><?php }?>
                         <th width="80">成交时间</th>
                       </tr>
                       <?php foreach ($dingdan as $r){?>

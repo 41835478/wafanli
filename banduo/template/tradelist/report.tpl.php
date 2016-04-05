@@ -196,7 +196,7 @@ $(function(){
 	</tr>
     <tr>
     <td align="right">获取方式：</td>
-    <td>&nbsp;阿里妈妈在线登录获取 <span class="zhushi login_guanlian"><a href="javascript:void(0)" id="test">点击测试</a>（注意，测试代码默认抓取今天的订单）</span></td>
+    <td>&nbsp;阿里妈妈在线登录获取 <span class="zhushi login_guanlian"><a href="javascript:void(0)" id="test">点击测试</a>（注意，测试代码默认抓取今天的订单）</span> <b style="color:red">（如果在线登录提示滑块登录，是淘宝帐号被限制目前无法解决请使用人工手动导入）</b></td>
     </tr>
     <?php if($yzm_url){?>
     <tr style="height:35px;">

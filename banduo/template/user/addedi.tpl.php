@@ -175,6 +175,14 @@ $(function(){
     <td>&nbsp;<?=limit_input('tbyitixian',jfb_data_type($row['tbyitixian']),150,0)?></td>
   </tr>
   <tr>
+    <td align="right">auto_jfb：</td>
+    <td>&nbsp;<input name="auto_jfb" type="text" id="auto_jfb" value="<?=$row['auto_jfb']?>" /></td>
+  </tr>
+  <tr>
+    <td align="right">auto_jine：</td>
+    <td>&nbsp;<input name="auto_jine" type="text" id="auto_jine" value="<?=$row['auto_jine']?>" /></td>
+  </tr>
+  <tr>
     <td align="right">已兑换<?=TBMONEY?>：</td>
     <td>&nbsp;<?=(float)$spend_jifenbao?> <?=TBMONEYUNIT?></td>
   </tr>

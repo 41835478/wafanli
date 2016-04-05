@@ -226,8 +226,9 @@ $(function(){
     <?php }?>
     </td>
     </tr>
+
     <tr>
-      <td align="right">拍拍返现比率：</td>
+      <td align="right">VIP等级返利比率：</td>
     <td>&nbsp;
     <?php foreach($webset['paipaifxbl'] as $k=>$v){?>
     <?=$webset['level'][$k]['title']?$webset['level'][$k]['title']:'普通会员'?>：<input name="paipaifxbl[]" type="text" id="paipaifxbl" value="<?php echo $v*100;?>" size="10"  class="required" num="y" style="width:50px" />&nbsp;%&nbsp;&nbsp;

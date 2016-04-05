@@ -586,7 +586,7 @@ $(function(){
                     <?php if($app_show==1){?>
                     <li id="apilogin"><a href="<?=u('user','info',array('do'=>'apilogin'))?>">账号通设置</a></li>
                     <?php }?>
-                    <li id="caiwu"><a href="<?=u('user','info',array('do'=>'caiwu'))?>">个人财务设置</a> </li>
+                    <li id="caiwu"><a href="<?=u('user','info',array('do'=>'caiwu'))?>">自动返利设置</a> </li>
                     <?php if($webset['sms']['open']==1){?>
                     <li id="mobile"><a href="<?=u('user','info',array('do'=>'mobile'))?>">手机验证</a> </li>
                     <?php }?>
@@ -827,7 +827,36 @@ $(function(){
 		  <td><label class="field_notice">填写后不可更改</label><label id="checking_my_tenpay" class="checking">检查中...</label></td>
 		</tr>
         <?php }?>
-        
+
+        <!-- ###################### 护航网络 添加 start ############################# -->
+        <tr>
+            <td height="35" style="text-align:right">集分宝大于 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td>
+                <select name="auto_jfb" style="width:140px;height:30px;font-size:12px;color:red;border: 1px solid #ccc;">
+                    <option value="0"<?php echo $dduser['auto_jfb'] == 0 ? ' selected' : ''; ?>>未设置自动提取</option>
+                    <option value="500"<?php echo $dduser['auto_jfb'] == 500 ? ' selected' : ''; ?>>500</option>
+                    <option value="1000"<?php echo $dduser['auto_jfb'] == 1000 ? ' selected' : ''; ?>>1000</option>
+                    <option value="2000"<?php echo $dduser['auto_jfb'] == 2000 ? ' selected' : ''; ?>>2000</option>
+                    <option value="5000"<?php echo $dduser['auto_jfb'] == 5000 ? ' selected' : ''; ?>>5000</option>
+                </select>
+            </td>
+            <td><label class="field_notice"><?php echo TBMONEY; ?>时,自动提取全部集分宝</label></td>
+        </tr>
+        <tr>
+            <td height="35" style="text-align:right">余额大于 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td>
+                <select name="auto_jine" style="width:140px;height:30px;font-size:12px;color:red;border: 1px solid #ccc;">
+                    <option value="0"<?php echo $dduser['auto_jine'] == 0 ? ' selected' : ''; ?>>未设置自动提取</option>
+                    <option value="1"<?php echo $dduser['auto_jine'] == 1 ? ' selected' : ''; ?>>1元</option>
+                    <option value="5"<?php echo $dduser['auto_jine'] == 5 ? ' selected' : ''; ?>>5元</option>
+                    <option value="10"<?php echo $dduser['auto_jine'] == 10 ? ' selected' : ''; ?>>10元</option>
+                    <option value="20"<?php echo $dduser['auto_jine'] == 10 ? ' selected' : ''; ?>>20元</option>
+                </select>
+            </td>
+            <td><label class="field_notice">时，自动提取所有余额</label></td>
+        </tr>
+        <!-- ###################### 护航网络 添加 end ############################# -->
+
 		<?php if($webset['tixian']['need_bank']==1){?>
         <tr>
 		  <td height="35" style="text-align:right">选择银行 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
